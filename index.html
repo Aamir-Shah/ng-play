@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+
+<head>
+    <meta charset="UTF-8">
+    <title>M.N.Abbasi PolyBags</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="./static/dropDown.css"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--<script src="./bower_components/angularjs/angular.min.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/1.1.3/angularfire.min.js"></script>
+    <script defer src="https://code.getmdl.io/1.1.1/material.min.js"></script>
+    <script src="./static/dropDown.js"></script>
+    <script src="./app.js"></script>
+
+
+</head>
+
+<body ng-controller="indexController">
+<!-- Always shows a header, even in smaller screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <!-- Title -->
+            <span class="mdl-layout-title">M.N.Abbasi PolyBags</span>
+
+
+            <div class="mdl-layout-spacer"></div>
+
+            <nav class="mdl-navigation">
+
+                <div class="mdl-navigation__link" style="background-color: #ffffff; color: blue;">Total Entries:
+                    {{entries}}
+                </div>
+                <div class="mdl-navigation__link"><button  class="mdl-button mdl-js-button mdl-button--raised" ng-click="logOut()" style="color: #ffffff">Logout</button></div>
+            </nav>
+
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+                <label class="mdl-button mdl-js-button mdl-button--icon" for="sample10">
+                    <i class="material-icons">search</i>
+                </label>
+                <span class="mdl-textfield__expandable-holder">
+                    <input ng-model="searchText" class="mdl-textfield__input" type="text" id="sample10">
+                    <!--<label class="mdl-textfield__label" for="sample-expandable">Expandable Input</label>-->
+                </span>
+            </div>
+
+
+            <!-- Add spacer, to align navigation to the right -->
+
+            <!-- Navigation. We hide it in small screens. -->
+
+        </div>
+    </header>
+    <div ng-controller="indexController" class="mdl-layout__drawer">
+        <span class="mdl-layout-title">New Customer</span>
+        <nav class="mdl-navigation">
+            <form ng-submit="saveCustomerDetails()">
+                <div class="mdl-select mdl-js-select mdl-select--floating-label">
+                    <select required class="mdl-select__input" ng-model="details.itemName" id="Item" name="Item Name">
+                        <option value=""></option>
+                        <option value="H.D 5x6">H.D 5x6</option>
+                        <option value="H.D 5x7">H.D 5x7</option>
+                        <option value="H.D 6x7">H.D 6x7</option>
+                        <option value="H.D 6x8">H.D 6x8</option>
+                        <option value="H.D 8x10">H.D 8x10</option>
+                        <option value="H.S 8x11">H.S 8x11</option>
+                        <option value="H.S 10x14">H.S 10x14</option>
+                        <option value="H.S 12x16">H.S 12x16</option>
+                        <option value="H.S 14x18">H.S 14x18</option>
+                    </select>
+                    <label class="mdl-select__label" for="item">Item Name</label>
+                </div>
+
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input required class="mdl-textfield__input" type="text" id="sample4"
+                           ng-model="details.customerName">
+                    <label class="mdl-textfield__label" for="sample4">Customer Name</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input required class="mdl-textfield__input" type="number" id="sample6" ng-model="details.itemRate">
+                    <label class="mdl-textfield__label" for="sample6">Rate</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input required class="mdl-textfield__input" type="number" id="sample5"
+                           ng-model="details.itemWeight">
+                    <label class="mdl-textfield__label" for="sample5">Weight</label>
+                </div>
+
+                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox">
+                    <input ng-change="checkStatus()" ng-model="payment" type="checkbox" id="checkbox"
+                           class="mdl-checkbox__input">
+                    <span class="mdl-checkbox__label">Mark this entry as Unpaid</span>
+                </label>
+
+                <input style="width: 90%; margin: auto; display: block;"
+                       class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" value="Add Customer"
+                       type="submit"/>
+
+            </form>
+
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+
+
+        <table style="width: 100%;" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+            <thead>
+            <tr>
+                <th class="mdl-data-table__cell--non-numeric">Items</th>
+                <th>Customer</th>
+                <th>Weight</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Payment Status</th>
+                <th>Added On</th>
+                <th>Remove</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="items in wholeData | filter : searchText">
+
+                <td class="mdl-data-table__cell--non-numeric">
+                    {{items.itemName}}
+                </td>
+                <td>
+                    {{items.customerName}}
+                </td>
+                <td>
+                    {{items.itemWeight}}
+                </td>
+                <td>
+                    {{items.itemRate}}
+                </td>
+                <td>
+                    {{items.itemAmount}}
+                </td>
+                <td>
+                    <span ng-hide="items.isPaid"
+                          style="background-color: red; color: #ffffff; border-radius: 5px; padding: 5px 10px">Not Paid</span>
+                    <span ng-show="items.isPaid"
+                          style="background-color: forestgreen; color: #ffffff; border-radius: 5px; padding: 5px 10px">Paid</span>
+
+                    <!--<button ng-click="toggleButton($index)" ng-hide="items.isPaid"-->
+                    <!--style="background-color: red; color: #ffffff; border-radius: 5px; border: none;padding: 5px 10px">-->
+                    <!--Not Paid-->
+                    <!--</button>-->
+                    <!--<button ng-show="items.isPaid"-->
+                    <!--style="background-color: forestgreen; color: #ffffff; border-radius: 5px; border: none; padding: 5px 10px">-->
+                    <!--Paid-->
+                    <!--</button>-->
+
+
+                </td>
+                <td>{{date | date:"dd-MM-yyyy"}}</td>
+                <td>
+                    <button ng-click="removeEntry($index)" class="mdl-button mdl-js-button mdl-button--icon">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </td>
+
+            </tr>
+
+            </tbody>
+        </table>
+
+
+    </main>
+</div>
+
+
+</body>
+
+</html>
